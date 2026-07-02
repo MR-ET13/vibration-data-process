@@ -4,15 +4,16 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-ROTATE_SPEED_RPM = 3000  # 转速
+ROTATE_SPEED_RPM = 3090  # 转速
 WRITE_TO_CSV = True  # 是否写入csv文件
-TIME_DOMAIN = True  # 时域信号/频域分析
-SLICE_DOWN = 70  # 数据截取区间下
-SLICE_UP = 90  # 数据截取区间上
+TIME_DOMAIN = False  # 时域信号/频域分析
+TIME_ORIGINAL = False  # 原始信号
+SLICE_DOWN = 95  # 数据截取区间下
+SLICE_UP = 115  # 数据截取区间上
 
 def read_data_and_plot():
     # 读取csv，跳过前6行无用表头，以第6行作为列名
-    df = pd.read_csv(r"C:\Users\wngan\Desktop\采集卡\r3000A1A2 2026_07_01 11_43_01.csv"
+    df = pd.read_csv(r"C:\Users\wngan\Desktop\采集卡\r3090 2026_07_02 20_05_02.csv"
                      , skiprows=5, encoding="gbk")
 
     # 重命名列简化使用
@@ -32,15 +33,17 @@ def read_data_and_plot():
     sig_a1_change_slice = sig_a1_change[mask]
     sig_a2_change_slice = sig_a2_change[mask]
 
-    if TIME_DOMAIN:
+    if TIME_ORIGINAL:
+        plot_time_original(t, sig_a1, sig_a2)
+    elif TIME_DOMAIN:
         plot_time_domain(t_slice, sig_a1_change_slice, sig_a2_change_slice)
     else:
         plot_fft_domain(t_slice, sig_a1_change_slice, sig_a2_change_slice)
 
 
 def data_change(sig_a1, sig_a2):
-    sig_a1 = sig_a1 - sig_a1[0]
-    sig_a2 = sig_a2 - sig_a2[0]
+    sig_a1 = sig_a1 - np.mean(sig_a1[:int(10/0.001)])
+    sig_a2 = sig_a2 - np.mean(sig_a2[:int(10/0.001)])
     sig_a2 = - sig_a2
     return sig_a1, sig_a2
 
@@ -65,6 +68,17 @@ def fft_analysis(t, signal):
     amp[1:] = amp[1:] * 2  # 仅对f>0的交流分量×2，直流amp[0]保持原值
     dc_component = np.mean(signal)
     return freq, amp, fs, dc_component
+
+def plot_time_original(x, y1, y2):
+    # 简单绘图查看波形
+    plt.figure(figsize=(12, 5))
+    plt.plot(x, y1, label="Channel A1 (mm)")
+    plt.plot(x, y2, label="Channel A2 (mm)")
+    plt.xlabel("Time (s)")
+    plt.ylabel("Displacement (mm)")
+    plt.legend()
+    plt.grid(True)
+    plt.show()
 
 def plot_time_domain(x, y1, y2):
     # 简单绘图查看波形
