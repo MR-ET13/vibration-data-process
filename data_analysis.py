@@ -4,16 +4,17 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-ROTATE_SPEED_RPM = 3090  # 转速
+ROTATE_SPEED_RPM = 3180  # 转速
+REMARK = "N"
 WRITE_TO_CSV = True  # 是否写入csv文件
 TIME_DOMAIN = False  # 时域信号/频域分析
 TIME_ORIGINAL = False  # 原始信号
-SLICE_DOWN = 95  # 数据截取区间下
-SLICE_UP = 115  # 数据截取区间上
+SLICE_DOWN = 262  # 数据截取区间下
+SLICE_UP = 272  # 数据截取区间上
 
 def read_data_and_plot():
     # 读取csv，跳过前6行无用表头，以第6行作为列名
-    df = pd.read_csv(r"C:\Users\wngan\Desktop\采集卡\r3090 2026_07_02 20_05_02.csv"
+    df = pd.read_csv(r"C:\Users\wngan\Desktop\采集卡\r3180LL 2026_07_03 10_28_40.csv"
                      , skiprows=5, encoding="gbk")
 
     # 重命名列简化使用
@@ -155,6 +156,7 @@ def plot_fft_domain(x, y1, y2):
             "Peak_to_Peak": round(pp_a1, 6),
             "Max_Diff": max_diff,
             "Time_Period": f"{SLICE_DOWN} - {SLICE_UP}",
+            "Remark": REMARK,
         },
         {
             "Rotation_Speed": ROTATE_SPEED_RPM,
@@ -165,6 +167,7 @@ def plot_fft_domain(x, y1, y2):
             "Peak_to_Peak": round(pp_a2, 6),
             "Max_Diff": max_diff,
             "Time_Period": f"{SLICE_DOWN} - {SLICE_UP}",
+            "Remark": REMARK,
         }
     ]
     result_df = pd.DataFrame(result_data)
